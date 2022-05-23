@@ -8,7 +8,7 @@ class QuantFuncs:
     def __init__(self):
         self.test = "Hello"
 
-    def drawdown(self, data):
+    def drawdown(self, data: pd.DataFrame) -> pd.DataFrame:
 
         pass
 
@@ -32,7 +32,7 @@ class QuantFuncs:
 
         return df
 
-    def get_daily_cumulative_returns_multiple(self, data, weights):
+    def get_daily_cumulative_returns_multiple(self, data: list, weights: list) -> pd.DataFrame:
 
         returns = yf.download(data, start='2015-01-01', end='2022-05-20')['Adj Close']
 
