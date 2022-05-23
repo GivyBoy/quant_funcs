@@ -12,6 +12,12 @@ class QuantFuncs:
 
         pass
 
+    def returns(self, ticker: str) -> float:
+
+        returns = (yf.download(ticker, start='2015-01-01', end='2022-05-20')["Adj Close"].pct_change() + 1).prod() - 1
+
+        return round(returns * 100, 2)
+
     def get_cumulative_returns(self, ticker: str, investment: int) -> pd.DataFrame:
 
         returns = yf.download(ticker, start='2015-01-01', end='2022-05-20')
