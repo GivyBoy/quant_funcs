@@ -42,7 +42,7 @@ class QuantFuncs:
 
         port_pct = []
 
-        for i in range(1258, len(rets)):
+        for i in range(len(rets)):
             sum_port = 0
 
             for j, val in enumerate(rets.columns):
