@@ -1,12 +1,14 @@
+import numpy as np
 import pandas as pd
 import yfinance as yf
 import matplotlib.pyplot as plt
+from PyEMD import EMD, EEMD, CEEMDAN, Visualisation
 
 
 class QuantFuncs:
 
     def __init__(self):
-        self.test = "Hello"
+        pass
 
     def drawdown(self, data: pd.DataFrame) -> pd.DataFrame:
 
@@ -77,6 +79,149 @@ class QuantFuncs:
         cum_rets.plot()
 
         return cum_rets
+
+
+class TimeSeriesDecomposition:
+
+    def __init__(self, data: pd.DataFrame):
+        """
+        :param data: the closing price of a stock (or any time series - the plots will not work without dates)
+        """
+        self.data = data
+
+    def get_EMD(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        This functions uses the Empirical Mode Decomposition (EMD) Algorithm
+        It decomposes the stock price into a set of oscillator components called Intrinsic Mode Functions
+
+        :returns:
+        IMFs : numpy array
+            All the Intrinsic Mode Functions that make up the original stock price
+        residue : numpy array
+            The residue from the recently analyzed stock price
+        """
+        data_np = self.data.to_numpy()
+
+        emd = EMD()
+        emd.extrema_detection = "parabol"
+        emd.emd(data_np)
+        IMFs, residue = emd.get_imfs_and_residue()
+
+        nIMFs = IMFs.shape[0]
+
+        plt.figure(figsize=(15, 10))
+        plt.subplot(nIMFs + 2, 1, 1)
+
+        plt.plot(self.data, 'r')
+
+        plt.subplot(nIMFs + 2, 1, nIMFs + 2)
+        plt.plot(self.data.index, residue)
+        plt.ylabel("Residue")
+
+        for n in range(nIMFs):
+            plt.subplot(nIMFs + 2, 1, n + 2)
+            plt.plot(self.data.index, IMFs[n], 'g')
+            plt.ylabel(f"eIMF %{(n + 1)}")
+            plt.locator_params(axis='y', nbins=4)
+
+        plt.tight_layout()
+        plt.show()
+
+        return IMFs, residue
+
+    def get_EEMD_residue(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        This functions uses the Ensemble Empirical Mode Decomposition (EMD) Algorithm
+        It decomposes the stock price into a set of oscillator components called Intrinsic Mode Functions
+        More robust than the EMD Algorithm
+
+        :returns:
+        IMFs : numpy array
+            All the Intrinsic Mode Functions that make up the original stock price
+        residue : numpy array
+            The residue from the recently analyzed stock price
+        """
+
+        data_np = self.data.to_numpy()
+
+        eemd = EEMD()
+        eemd.extrema_detection = "parabol"
+        eemd.eemd(data_np)
+        IMFs, residue = eemd.get_imfs_and_residue()
+
+        nIMFs = IMFs.shape[0]
+
+        plt.figure(figsize=(18, 12))
+        plt.subplot(nIMFs + 2, 1, 1)
+
+        plt.plot(self.data, 'r')
+
+        plt.subplot(nIMFs + 2, 1, nIMFs + 2)
+        plt.plot(self.data.index, residue)
+        plt.ylabel("Residue")
+
+        for n in range(nIMFs):
+            plt.subplot(nIMFs + 2, 1, n + 2)
+            plt.plot(self.data.index, IMFs[n], 'g')
+            plt.ylabel(f"eIMF %{(n + 1)}")
+            plt.locator_params(axis='y', nbins=4)
+
+        plt.tight_layout()
+        plt.show()
+
+        return IMFs, residue
+
+    def get_CEEMD_residue(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Complete Ensemble EMD with Adaptive Noise (CEEMDAN) performs an EEMD
+        The difference is that the information about the noise is shared among all workers
+
+        :return:
+        IMFs : numpy array
+            All the Intrinsic Mode Functions that make up the original stock price
+        residue : numpy array
+            The residue from the recently analyzed stock price
+        """
+
+        data_np = self.data.to_numpy()
+
+        ceemd = CEEMDAN()
+        ceemd.extrema_detection = "parabol"
+        ceemd.ceemdan(data_np)
+        IMFs, residue = ceemd.get_imfs_and_residue()
+
+        nIMFs = IMFs.shape[0]
+
+        plt.figure(figsize=(18, 12))
+        plt.subplot(nIMFs + 2, 1, 1)
+
+        plt.plot(self.data, 'r')
+
+        plt.subplot(nIMFs + 2, 1, nIMFs + 2)
+        plt.plot(self.data.index, residue)
+        plt.ylabel("Residue")
+
+        for n in range(nIMFs):
+            plt.subplot(nIMFs + 2, 1, n + 2)
+            plt.plot(self.data.index, IMFs[n], 'g')
+            plt.ylabel(f"eIMF %{(n + 1)}")
+            plt.locator_params(axis='y', nbins=4)
+
+        plt.tight_layout()
+        plt.show()
+
+        return IMFs, residue
+
+    def plot_IMFs(self, IMFs: np.ndarray, residue: np.ndarray, num_IMFs: int):
+
+        sum_IMFs = sum(IMFs[-num_IMFs:])
+        sum_IMFs += residue
+
+        plt.figure(figsize=(12, 10))
+        plt.plot(self.data.index, self.data, label="Stock Price")
+        plt.plot(self.data.index, sum_IMFs, label=f"Last {num_IMFs} IMFs")
+        plt.legend(loc="upper left")
+        plt.show()
 
 
 if __name__ == "__main__":
