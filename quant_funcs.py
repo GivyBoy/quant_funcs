@@ -12,9 +12,9 @@ class QuantFuncs:
 
         pass
 
-    def returns(self, ticker: str) -> float:
+    def returns(self, ticker: str, start: str, end: str) -> float:
 
-        returns = (yf.download(ticker, start='2015-01-01', end='2022-05-20')["Adj Close"].pct_change() + 1).prod() - 1
+        returns = (yf.download(ticker, start=start, end=end)["Adj Close"].pct_change() + 1).prod() - 1
 
         return round(returns * 100, 2)
 
@@ -34,7 +34,7 @@ class QuantFuncs:
 
         holder = {"Cumulative Rets": cum_ret}
 
-        df = pd.DataFrame(data=holder)
+        df = pd.DataFrame(data=holder) - 1
 
         return df
 
@@ -72,7 +72,7 @@ class QuantFuncs:
 
         data_port = {"Daily Cumulative Returns": cum_port}
 
-        cum_rets = pd.DataFrame(data_port)
+        cum_rets = pd.DataFrame(data_port) - 1
 
         cum_rets.plot()
 
@@ -82,6 +82,10 @@ class QuantFuncs:
 if __name__ == "__main__":
     q = QuantFuncs()
 
-    aapl = q.get_cumulative_returns('aapl', 1000)
+    rets = q.returns('xom', "2015-01-01", "2022-06-10")
+    cum_ret = q.get_cumulative_returns("xom", 1000)
 
-    print(aapl)
+    print(f"{rets}-{cum_ret}")
+
+
+
