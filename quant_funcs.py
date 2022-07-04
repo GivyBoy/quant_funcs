@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from PyEMD import EMD, EEMD, CEEMDAN
 
 
-class QuantFuncs:
+class Metrics:
 
     def __init__(self):
         pass
@@ -233,7 +233,7 @@ class TimeSeriesDecomposition:
 
 
 if __name__ == "__main__":
-    q = QuantFuncs()
+    q = Metrics()
 
     rets = q.returns('xom', "2015-01-01", "2022-06-10")
     cum_ret = q.get_cumulative_returns("xom", 1000)
