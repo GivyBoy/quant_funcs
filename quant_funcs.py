@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 import matplotlib.pyplot as plt
-from PyEMD import EMD, EEMD, CEEMDAN, Visualisation
+from PyEMD import EMD, EEMD, CEEMDAN
 
 
 class QuantFuncs:
@@ -213,6 +213,14 @@ class TimeSeriesDecomposition:
         return IMFs, residue
 
     def plot_IMFs(self, IMFs: np.ndarray, residue: np.ndarray, num_IMFs: int):
+        """
+        This function aims to reconstruct the Time Series using the IMFs
+
+        :param IMFs: The IMFs returned from using any of the decomposition functions above
+        :param residue: The residue returned from using any of the decomposition functions above
+        :param num_IMFs: The number of IMFs you want to reconstruct your data. A value of 2 means the last two IMFs
+        :return: None
+        """
 
         sum_IMFs = sum(IMFs[-num_IMFs:])
         sum_IMFs += residue
